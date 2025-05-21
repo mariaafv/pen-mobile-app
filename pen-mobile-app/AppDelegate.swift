@@ -4,6 +4,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
+  var homeRouter: HomeRouter?
   
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -11,7 +12,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.backgroundColor = .systemGray6
     window?.tintColor = .systemRed
-    window?.rootViewController = UINavigationController(rootViewController: YourNotesViewController())
+    let navigationController = UINavigationController()
+    let router = HomeRouter(navigationController: navigationController)
+    self.homeRouter = router
+    
+    let homeViewController = router.start()
+    navigationController.viewControllers = [homeViewController]
+    window?.rootViewController = navigationController
     window?.makeKeyAndVisible()
     
     return true

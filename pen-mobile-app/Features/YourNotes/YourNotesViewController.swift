@@ -2,7 +2,16 @@ import UIKit
 
 class YourNotesViewController: UIViewController {
   private let customView = YourNotesView()
+  private let viewModel: YourNotesViewModelProtocol
   
+  init(viewModel: YourNotesViewModelProtocol) {
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   override func loadView() {
     self.view = customView
   }
@@ -12,14 +21,22 @@ class YourNotesViewController: UIViewController {
     setupNavigationBar()
   }
   
+  @objc private func didTapAdd() {
+    viewModel.callAddNote()
+  }
+  
+  @objc private func didTapFilter() {
+    print("Abrir filtros")
+  }
+}
+
+extension YourNotesViewController {
   func setupNavigationBar() {
-    // Criar o label
     let titleLabel = UILabel()
     titleLabel.text = "Tasks"
     titleLabel.font = UIFont.boldSystemFont(ofSize: 32)
     titleLabel.textColor = .black
     
-    // Criar um container para o label e descer ele
     let titleContainer = UIView()
     titleContainer.backgroundColor = .clear
     titleContainer.addSubview(titleLabel)
@@ -27,15 +44,14 @@ class YourNotesViewController: UIViewController {
     
     NSLayoutConstraint.activate([
       titleLabel.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
-      titleLabel.topAnchor.constraint(equalTo: titleContainer.topAnchor, constant: 12), // Desce 6pt
+      titleLabel.topAnchor.constraint(equalTo: titleContainer.topAnchor, constant: 12),
       titleLabel.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
       titleLabel.trailingAnchor.constraint(equalTo: titleContainer.trailingAnchor)
     ])
     
     let titleItem = UIBarButtonItem(customView: titleContainer)
-    navigationItem.leftBarButtonItems = [titleItem] // ou adicione o botão de voltar se necessário
+    navigationItem.leftBarButtonItems = [titleItem]
     
-    // Botões de ação à direita
     let addButton = makeCircleButton(systemName: "plus", action: #selector(didTapAdd))
     let filterButton = makeCircleButton(systemName: "slider.horizontal.3", action: #selector(didTapFilter))
     
@@ -57,7 +73,6 @@ class YourNotesViewController: UIViewController {
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightContainer)
     
-    // Estilo padrão da barra
     navigationController?.navigationBar.tintColor = .black
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationController?.navigationBar.backgroundColor = .systemGray6
@@ -85,11 +100,4 @@ class YourNotesViewController: UIViewController {
     return button
   }
   
-  @objc private func didTapAdd() {
-    print("Adicionar tarefa")
-  }
-  
-  @objc private func didTapFilter() {
-    print("Abrir filtros")
-  }
 }
