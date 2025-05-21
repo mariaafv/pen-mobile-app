@@ -12,6 +12,7 @@ class YourNotesViewController: UIViewController {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
   override func loadView() {
     self.view = customView
   }
@@ -33,7 +34,7 @@ class YourNotesViewController: UIViewController {
 extension YourNotesViewController {
   func setupNavigationBar() {
     let titleLabel = UILabel()
-    titleLabel.text = "Tasks"
+    titleLabel.text = "Notes"
     titleLabel.font = UIFont.boldSystemFont(ofSize: 32)
     titleLabel.textColor = .black
     

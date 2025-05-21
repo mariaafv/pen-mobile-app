@@ -11,7 +11,7 @@ class AddNoteView: UIView {
     return noteName
   }()
   
-  lazy var descriptionTextField: UITextView = {
+  let descriptionTextField: UITextView = {
     let descriptionTextField = UITextView()
     descriptionTextField.layer.borderWidth = 1
     descriptionTextField.layer.borderColor = UIColor.systemGray5.cgColor
@@ -23,6 +23,15 @@ class AddNoteView: UIView {
     descriptionTextField.isUserInteractionEnabled = true
     descriptionTextField.translatesAutoresizingMaskIntoConstraints = false
     return descriptionTextField
+  }()
+  
+  let microphoneButton: UIImageView = {
+    let microphoneButton = UIImageView()
+    microphoneButton.image = UIImage(systemName: "microphone.fill")
+    microphoneButton.isUserInteractionEnabled = true
+    microphoneButton.tintColor = .systemGray
+    microphoneButton.translatesAutoresizingMaskIntoConstraints = false
+    return microphoneButton
   }()
   
   override init(frame: CGRect) {
@@ -37,6 +46,7 @@ class AddNoteView: UIView {
   func setupView() {
     addSubview(noteName)
     addSubview(descriptionTextField)
+    addSubview(microphoneButton)
     
     NSLayoutConstraint.activate([
       noteName.topAnchor.constraint(equalTo: topAnchor, constant: 60),
@@ -49,6 +59,9 @@ class AddNoteView: UIView {
       descriptionTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
       descriptionTextField.widthAnchor.constraint(equalToConstant: 360),
       descriptionTextField.heightAnchor.constraint(equalToConstant: 160),
+      
+      microphoneButton.topAnchor.constraint(equalTo: descriptionTextField.bottomAnchor, constant: 10),
+      microphoneButton.trailingAnchor.constraint(equalTo: descriptionTextField.trailingAnchor, constant: -10)
     ])
   }
 }

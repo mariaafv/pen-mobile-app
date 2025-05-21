@@ -26,8 +26,13 @@ extension HomeRouter: HomeNavigationDelegate {
 
 extension HomeRouter: YourNotesNavigationDelegate {
   func callAddNewNote() {
-//    let viewModel = AddNoteViewModel()
-    let viewController = AddNoteViewController()
+    let viewModel = AddNoteViewModel()
+    let viewController = AddNoteViewController(viewModel: viewModel)
+    viewController.modalPresentationStyle = .pageSheet
+    if let sheet = viewController.sheetPresentationController {
+        sheet.detents = [.custom(resolver: { _ in 340 })]
+        sheet.prefersGrabberVisible = true
+    }
     navigationController?.present(viewController, animated: true)
   }
 }
