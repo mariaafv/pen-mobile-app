@@ -27,8 +27,45 @@ class AddNoteViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    setupNavigationBar()
     requestTranscribePermissions()
     makeMicrophoneButtonClickable()
+    setupSaveButton()
+  }
+  
+  private func setupNavigationBar() {
+    navigationItem.title = "New Note"
+//    navigationItem.leftBarButtonItem = UIBarButtonItem(
+//      barButtonSystemItem: .cancel,
+//      target: self,
+//      action: #selector(cancelTapped)
+//    )
+  }
+  
+  private func setupSaveButton() {
+    customView.saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
+  }
+  
+//  @objc private func cancelTapped() {
+//    dismiss(animated: true)
+//  }
+  
+  @objc private func saveButtonTapped() {
+    let title = customView.noteName.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let description = customView.descriptionTextField.textColor == UIColor.placeholderText ? "" : customView.descriptionTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    
+    if title.isEmpty && description.isEmpty {
+      showAlert(message: "Please enter a title or description for your note.")
+      return
+    }
+    
+    viewModel.saveNote(title: title, description: description)
+  }
+  
+  private func showAlert(message: String) {
+    let alert = UIAlertController(title: "Empty Note", message: message, preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "OK", style: .default))
+    present(alert, animated: true)
   }
   
   func requestTranscribePermissions() {
@@ -54,10 +91,10 @@ class AddNoteViewController: UIViewController {
   @objc func microphoneTapped() {
     if audioEngine.isRunning {
       stopRecording()
-     // customView.microphoneButton.setTitle("Start Recording", for: .normal) // ajuste conforme seu botão
+      customView.microphoneButton.tintColor = .systemGray
     } else {
       startRecording()
-      //customView.microphoneButton.setTitle("Stop Recording", for: .normal)
+      customView.microphoneButton.tintColor = .systemRed
     }
   }
   
@@ -96,6 +133,11 @@ class AddNoteViewController: UIViewController {
       if let result = result {
         print("Transcription: \(result.bestTranscription.formattedString)")
         DispatchQueue.main.async {
+          // Se o textView ainda tem o placeholder, limpe-o primeiro
+          if self.customView.descriptionTextField.textColor == UIColor.placeholderText {
+            self.customView.descriptionTextField.text = ""
+            self.customView.descriptionTextField.textColor = UIColor.label
+          }
           self.customView.descriptionTextField.text = result.bestTranscription.formattedString
         }
         isFinal = result.isFinal
@@ -103,7 +145,9 @@ class AddNoteViewController: UIViewController {
       
       if error != nil || isFinal {
         self.stopRecording()
-        //self.customView.microphoneButton.setTitle("Start Recording", for: .normal)
+        DispatchQueue.main.async {
+          self.customView.microphoneButton.tintColor = .systemGray
+        }
       }
     }
     

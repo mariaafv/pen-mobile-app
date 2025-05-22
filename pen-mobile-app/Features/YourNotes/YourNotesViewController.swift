@@ -20,6 +20,28 @@ class YourNotesViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setupNavigationBar()
+    setupCollectionView()
+    bindViewModel()
+    updateEmptyState()
+  }
+  
+  private func setupCollectionView() {
+    customView.collectionView.delegate = self
+    customView.collectionView.dataSource = self
+    customView.collectionView.register(NoteCollectionViewCell.self, forCellWithReuseIdentifier: NoteCollectionViewCell.identifier)
+  }
+  
+  private func bindViewModel() {
+    viewModel.onNotesUpdated = { [weak self] in
+      DispatchQueue.main.async {
+        self?.customView.collectionView.reloadData()
+        self?.updateEmptyState()
+      }
+    }
+  }
+  
+  private func updateEmptyState() {
+    customView.showEmptyState(viewModel.notes.isEmpty)
   }
   
   @objc private func didTapAdd() {
@@ -31,6 +53,36 @@ class YourNotesViewController: UIViewController {
   }
 }
 
+// MARK: - UICollectionViewDataSource
+extension YourNotesViewController: UICollectionViewDataSource {
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return viewModel.notes.count
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NoteCollectionViewCell.identifier, for: indexPath) as? NoteCollectionViewCell else {
+      return UICollectionViewCell()
+    }
+    
+    let note = viewModel.notes[indexPath.item]
+    cell.configure(with: note, at: indexPath)
+    return cell
+  }
+}
+
+// MARK: - UICollectionViewDelegate
+extension YourNotesViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    collectionView.deselectItem(at: indexPath, animated: true)
+    
+    // TODO: - implementar a navegação para editar a nota
+
+    let selectedNote = viewModel.notes[indexPath.item]
+    print("Selected note: \(selectedNote.title)")
+  }
+}
+
+// MARK: - Navigation Bar Setup
 extension YourNotesViewController {
   func setupNavigationBar() {
     let titleLabel = UILabel()
@@ -79,8 +131,6 @@ extension YourNotesViewController {
     navigationController?.navigationBar.backgroundColor = .systemGray6
   }
   
-  
-  
   private func makeCircleButton(systemName: String, action: Selector) -> UIButton {
     let button = UIButton(type: .system)
     let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold)
@@ -100,5 +150,4 @@ extension YourNotesViewController {
     button.addTarget(self, action: action, for: .touchUpInside)
     return button
   }
-  
 }

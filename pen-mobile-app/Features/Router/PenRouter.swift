@@ -3,6 +3,7 @@ import UIKit
 final class HomeRouter {
   weak var navigationController: UINavigationController?
   private weak var homeViewController: UIViewController?
+  private var yourNotesViewModel: YourNotesViewModel?
   
   init(navigationController: UINavigationController?) {
     self.navigationController = navigationController
@@ -19,6 +20,7 @@ final class HomeRouter {
 extension HomeRouter: HomeNavigationDelegate {
   func goToYourNotes() {
     let viewModel = YourNotesViewModel(navigationDelegate: self)
+    self.yourNotesViewModel = viewModel
     let viewController = YourNotesViewController(viewModel: viewModel)
     navigationController?.pushViewController(viewController, animated: true)
   }
@@ -26,13 +28,30 @@ extension HomeRouter: HomeNavigationDelegate {
 
 extension HomeRouter: YourNotesNavigationDelegate {
   func callAddNewNote() {
-    let viewModel = AddNoteViewModel()
+    let viewModel = AddNoteViewModel(navigationDelegate: self)
     let viewController = AddNoteViewController(viewModel: viewModel)
-    viewController.modalPresentationStyle = .pageSheet
-    if let sheet = viewController.sheetPresentationController {
-        sheet.detents = [.custom(resolver: { _ in 340 })]
-        sheet.prefersGrabberVisible = true
+    
+    // Apresentar em um navigation controller para ter botão de cancelar
+    let navController = UINavigationController(rootViewController: viewController)
+    navController.modalPresentationStyle = .pageSheet
+    
+    if let sheet = navController.sheetPresentationController {
+      sheet.detents = [.medium(), .large()]
+      sheet.prefersGrabberVisible = true
     }
-    navigationController?.present(viewController, animated: true)
+    
+    navigationController?.present(navController, animated: true)
+  }
+  
+  
+}
+
+extension HomeRouter: AddNoteNavigationDelegate {
+  func didSaveNote(_ note: Note) {
+    yourNotesViewModel?.addNote(note)
+  }
+  
+  func dismissAddNote() {
+    navigationController?.dismiss(animated: true)
   }
 }

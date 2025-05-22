@@ -10,8 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
     window = UIWindow(frame: UIScreen.main.bounds)
-    window?.backgroundColor = .systemGray6
-    window?.tintColor = .systemRed
+    window?.backgroundColor = .appBackground
     let navigationController = UINavigationController()
     let router = HomeRouter(navigationController: navigationController)
     self.homeRouter = router

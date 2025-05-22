@@ -1,10 +1,12 @@
 import Foundation
 
 protocol AddNoteViewModelProtocol: AnyObject {
+  func saveNote(title: String, description: String)
 }
 
 protocol AddNoteNavigationDelegate: AnyObject {
-  func callAddNewNote()
+  func didSaveNote(_ note: Note)
+  func dismissAddNote()
 }
 
 class AddNoteViewModel {
@@ -16,5 +18,9 @@ class AddNoteViewModel {
 }
 
 extension AddNoteViewModel: AddNoteViewModelProtocol {
-  
+  func saveNote(title: String, description: String) {
+    let note = Note(title: title, description: description)
+    navigationDelegate?.didSaveNote(note)
+    navigationDelegate?.dismissAddNote()
+  }
 }
