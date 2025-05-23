@@ -28,6 +28,7 @@ class AddNoteViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setupNavigationBar()
+    setupView()
     requestTranscribePermissions()
     makeMicrophoneButtonClickable()
     setupSaveButton()
@@ -35,20 +36,19 @@ class AddNoteViewController: UIViewController {
   
   private func setupNavigationBar() {
     navigationItem.title = "New Note"
-//    navigationItem.leftBarButtonItem = UIBarButtonItem(
-//      barButtonSystemItem: .cancel,
-//      target: self,
-//      action: #selector(cancelTapped)
-//    )
+  }
+  
+  func setupView() {
+    if viewModel.previousNote != nil {
+      customView.noteName.text = viewModel.previousNote?.title
+      customView.descriptionTextField.text = viewModel.previousNote?.description
+      customView.descriptionTextField.textColor = .black
+    }
   }
   
   private func setupSaveButton() {
     customView.saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
   }
-  
-//  @objc private func cancelTapped() {
-//    dismiss(animated: true)
-//  }
   
   @objc private func saveButtonTapped() {
     let title = customView.noteName.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -99,13 +99,11 @@ class AddNoteViewController: UIViewController {
   }
   
   func startRecording() {
-    // Cancelar a task anterior
     if recognitionTask != nil {
       recognitionTask?.cancel()
       recognitionTask = nil
     }
     
-    // Configurar a sessão de áudio
     let audioSession = AVAudioSession.sharedInstance()
     do {
       try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
@@ -133,7 +131,6 @@ class AddNoteViewController: UIViewController {
       if let result = result {
         print("Transcription: \(result.bestTranscription.formattedString)")
         DispatchQueue.main.async {
-          // Se o textView ainda tem o placeholder, limpe-o primeiro
           if self.customView.descriptionTextField.textColor == UIColor.placeholderText {
             self.customView.descriptionTextField.text = ""
             self.customView.descriptionTextField.textColor = UIColor.label

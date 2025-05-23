@@ -74,11 +74,11 @@ extension YourNotesViewController: UICollectionViewDataSource {
 extension YourNotesViewController: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     collectionView.deselectItem(at: indexPath, animated: true)
-    
-    // TODO: - implementar a navegação para editar a nota
-
+  
     let selectedNote = viewModel.notes[indexPath.item]
     print("Selected note: \(selectedNote.title)")
+    viewModel.editNote(note: selectedNote, index: indexPath.item)
+  
   }
 }
 

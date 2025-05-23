@@ -17,6 +17,8 @@ final class HomeRouter {
   }
 }
 
+// MARK: - Navegação a partir da Home
+
 extension HomeRouter: HomeNavigationDelegate {
   func goToYourNotes() {
     let viewModel = YourNotesViewModel(navigationDelegate: self)
@@ -26,12 +28,13 @@ extension HomeRouter: HomeNavigationDelegate {
   }
 }
 
+// MARK: - Navegação a partir da tela de notas
+
 extension HomeRouter: YourNotesNavigationDelegate {
   func callAddNewNote() {
     let viewModel = AddNoteViewModel(navigationDelegate: self)
     let viewController = AddNoteViewController(viewModel: viewModel)
     
-    // Apresentar em um navigation controller para ter botão de cancelar
     let navController = UINavigationController(rootViewController: viewController)
     navController.modalPresentationStyle = .pageSheet
     
@@ -43,14 +46,33 @@ extension HomeRouter: YourNotesNavigationDelegate {
     navigationController?.present(navController, animated: true)
   }
   
-  
+  func editNote(note: Note, index: Int) {
+    let viewModel = AddNoteViewModel(navigationDelegate: self, previousNote: note, index: index)
+    let viewController = AddNoteViewController(viewModel: viewModel)
+    
+    let navController = UINavigationController(rootViewController: viewController)
+    navController.modalPresentationStyle = .pageSheet
+    
+    if let sheet = navController.sheetPresentationController {
+      sheet.detents = [.medium(), .large()]
+      sheet.prefersGrabberVisible = true
+    }
+    
+    navigationController?.present(navController, animated: true)
+  }
 }
 
+// MARK: - Navegação de retorno da AddNote
+
 extension HomeRouter: AddNoteNavigationDelegate {
-  func didSaveNote(_ note: Note) {
-    yourNotesViewModel?.addNote(note)
+  func didSaveNote(_ note: Note, at index: Int?) {
+    if let index = index {
+      yourNotesViewModel?.updateNote(note, at: index)
+    } else {
+      yourNotesViewModel?.addNote(note)
+    }
   }
-  
+
   func dismissAddNote() {
     navigationController?.dismiss(animated: true)
   }
